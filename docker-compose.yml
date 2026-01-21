@@ -1,20 +1,44 @@
-version: "3.9"
+version: '3.8'
 
 services:
+  # PostgreSQL Database
   postgres:
     image: postgres
-    container_name: postgres-db
-
-    ports:
-      - "5432:5432"
-
+    container_name: kenya_agri_postgres
+    restart: always
     environment:
       POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin123
-      POSTGRES_DB: agdata_db
-
+      POSTGRES_PASSWORD: ag_admin
+      POSTGRES_DB: kenya_ag_data
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+     - agri_net
 
+  # pgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: kenya_agri_pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@agriculture.com
+      PGADMIN_DEFAULT_PASSWORD: ag_admin
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    networks:
+      - agri_net
+    
+# Volumes for data persistence
 volumes:
   postgres_data:
+  pgadmin_data:
+  
+  #Ensuring all services are in the same network
+networks:
+  agri_net:
